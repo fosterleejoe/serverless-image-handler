@@ -46,6 +46,9 @@ function getPreviewImage() {
     const _smartCrop = $(`#editor-smart-crop`).first().prop("checked");
     const _smartCropIndex = $(`#editor-smart-crop-index`).first().val();
     const _smartCropPadding = $(`#editor-smart-crop-padding`).first().val();
+    const _smartCrop2 = $(`#editor-smart-crop2`).first().prop("checked");
+    const _smartCrop2MinConfidence = $(`#editor-smart-crop2-min-confidence`).first().val();
+    const _smartCrop2Padding = $(`#editor-smart-crop2-padding`).first().val();
     // Setup the edits object
     const _edits = {}
     _edits.resize = {};
@@ -72,6 +75,11 @@ function getPreviewImage() {
         _edits.smartCrop = {};
         if (_smartCropIndex !== "") { _edits.smartCrop.faceIndex = Number(_smartCropIndex) }
         if (_smartCropPadding !== "") { _edits.smartCrop.padding = Number(_smartCropPadding) }
+    }
+    if (_smartCrop2) {
+        _edits.smartCrop2 = {};
+        if (_smartCrop2MinConfidence !== "") { _edits.smartCrop2.minConfidence = Number(_smartCrop2MinConfidence) }
+        if (_smartCrop2Padding !== "") { _edits.smartCrop2.padding = Number(_smartCrop2Padding) }
     }
     if (Object.keys(_edits.resize).length === 0) { delete _edits.resize };
     // Gather the bucket and key names

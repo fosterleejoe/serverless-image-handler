@@ -141,6 +141,21 @@ class ImageHandler {
                         message: 'The padding value you provided exceeds the boundaries of the original image. Please try choosing a smaller value or applying padding via Sharp for greater specificity.'
                     };
                 }
+            } else if (editKey === 'smartCrop2') {
+                const options = value;
+                const metadata = await image.metadata();
+                const imageBuffer = await image.toBuffer();
+                const boundingBox = await this.getBoundingBox2(imageBuffer, options.minConfidence);
+                const cropArea = this.getCropArea(boundingBox, options, metadata);
+                try {
+                    image.extract(cropArea);
+                } catch (err) {
+                    throw {
+                        status: 400,
+                        code: 'SmartCrop::PaddingOutOfBounds',
+                        message: 'The padding value you provided exceeds the boundaries of the original image. Please try choosing a smaller value or applying padding via Sharp for greater specificity.'
+                    };
+                }
             } else {
                 image[editKey](value);
             }
@@ -217,12 +232,17 @@ class ImageHandler {
     getCropArea(boundingBox, options, metadata) {
         const padding = (options.padding !== undefined) ? parseFloat(options.padding) : 0;
         // Calculate the smart crop area
+        const left = (parseInt((boundingBox.Left * metadata.width) - padding) > 0 ? parseInt((boundingBox.Left * metadata.width) - padding) : 0);
+        const top = (parseInt((boundingBox.Top * metadata.height) - padding) > 0 ? parseInt((boundingBox.Top * metadata.height) - padding) : 0);
+        const width = ((left + parseInt((boundingBox.Width * metadata.width) + (padding * 2))) < metadata.width ? parseInt((boundingBox.Width * metadata.width) + (padding * 2)) : metadata.width - left);
+        const height = ((top + parseInt((boundingBox.Height * metadata.height) + (padding * 2))) < metadata.height ? parseInt((boundingBox.Height * metadata.height) + (padding * 2)) : metadata.height - top);
         const cropArea = {
-            left : parseInt((boundingBox.Left * metadata.width) - padding),
-            top : parseInt((boundingBox.Top * metadata.height) - padding),
-            width : parseInt((boundingBox.Width * metadata.width) + (padding * 2)),
-            height : parseInt((boundingBox.Height * metadata.height) + (padding * 2)),
+            left : left,
+            top : top,
+            width : width,
+            height : height,
         }
+        console.log(metadata, cropArea);
         // Return the crop area
         return cropArea;
     }
@@ -239,6 +259,69 @@ class ImageHandler {
         try {
             const response = await this.rekognition.detectFaces(params).promise();
             return response.FaceDetails[faceIdx].BoundingBox;
+        } catch (err) {
+            console.error(err);
+            if (err.message === "Cannot read property 'BoundingBox' of undefined") {
+                throw {
+                    status: 400,
+                    code: 'SmartCrop::FaceIndexOutOfRange',
+                    message: 'You have provided a FaceIndex value that exceeds the length of the zero-based detectedFaces array. Please specify a value that is in-range.'
+                };
+            } else {
+                throw {
+                    status: 500,
+                    code: err.code,
+                    message: err.message
+                };
+            }
+        }
+    }
+
+    /**
+     * Gets the bounding box containing all features within an image.
+     * @param {Sharp} imageBuffer - The original image.
+     * @param {Integer} minConfidence - The minimum confidence for detected labels.
+     */
+    async getBoundingBox2(imageBuffer, minConfidence) {
+        const minConfidenceParam = (minConfidence !== undefined) ? minConfidence : 0;
+        const params = { Image: { Bytes: imageBuffer }, MinConfidence: minConfidenceParam };
+        try {
+            let boundingBox = {
+              "Height": 0,
+              "Left": 0.5,
+              "Top": 0.5,
+              "Width": 0
+            }
+            const response = await this.rekognition.detectLabels(params).promise();
+            console.log(response);
+            let labelInstancesdetected = 0;
+            for (const label of response.Labels) {
+              //console.log("Label detected: ", label.Name, "Confidence: ", label.Confidence);
+              for (const instance of label.Instances){
+                console.log("Label Instance detected: ", label.Name, "Label Confidence: ", label.Confidence, "Instance Confidence: ", instance.Confidence);
+                labelInstancesdetected += 1;
+                // Top coordinate as % of image
+                boundingBox.Top = (instance.BoundingBox.Top < boundingBox.Top ? instance.BoundingBox.Top : boundingBox.Top);
+                // Left coordinate as % of image
+                boundingBox.Left = (instance.BoundingBox.Left < boundingBox.Left ? instance.BoundingBox.Left : boundingBox.Left);
+                // Height as % of image
+                const lowerCoord = instance.BoundingBox.Top + instance.BoundingBox.Height;
+                boundingBox.Height = ((instance.BoundingBox.Top + instance.BoundingBox.Height) > (boundingBox.Top + boundingBox.Height) ? (instance.BoundingBox.Top + instance.BoundingBox.Height) - boundingBox.Top : boundingBox.Height);
+                // Width as % of image
+                boundingBox.Width = ((instance.BoundingBox.Left + instance.BoundingBox.Width) > (boundingBox.Left + boundingBox.Width) ? (instance.BoundingBox.Left + instance.BoundingBox.Width) - boundingBox.Left : boundingBox.Width);;
+                console.log("Bounding Box :", boundingBox);
+              }
+            }
+            if  ( labelInstancesdetected == 0) {
+              // No label instances detected, return full image
+              boundingBox = {
+                "Height": 1,
+                "Left": 0,
+                "Top": 0,
+                "Width": 1
+              }
+            }
+            return boundingBox;
         } catch (err) {
             console.error(err);
             if (err.message === "Cannot read property 'BoundingBox' of undefined") {

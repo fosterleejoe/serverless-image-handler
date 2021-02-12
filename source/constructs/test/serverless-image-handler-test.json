@@ -311,6 +311,11 @@
               "Action": "rekognition:DetectFaces",
               "Effect": "Allow",
               "Resource": "*"
+            },
+            {
+              "Action": "rekognition:DetectLabels",
+              "Effect": "Allow",
+              "Resource": "*"
             }
           ],
           "Version": "2012-10-17"
@@ -337,7 +342,7 @@
           "rules_to_suppress": [
             {
               "id": "W12",
-              "reason": "rekognition:DetectFaces requires '*' resources."
+              "reason": "rekognition:DetectLabels requires '*' resources."
             }
           ]
         }

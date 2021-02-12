@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    
+
     <script src="scripts.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -45,8 +45,8 @@
                     <div class="card-body">
                         <h5 class="card-title">Original Image</h5>
                         <h6 class="card-subtitle mb-2 text-muted" id="gallery-details"></h6>
-                        <img id="img-original" src="#" alt="Original Image"/>    
-                        <br>                                    
+                        <img id="img-original" src="#" alt="Original Image"/>
+                        <br>
                         <a href="#" data-toggle="tooltip" title="" data-placement="top" data-original-title="Be sure that you're providing a bucket name that's in your account and specified in your SOURCE_BUCKETS environment variable, as well as a properly-spelled image name with the file extension (ex. sample.jpg)." style="font-size:0.8em">Having trouble?</a>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="col-sm">
                                     <div class="form-group">
-                                        <label for="editor-background-color">Background Color</label>                                        
+                                        <label for="editor-background-color">Background Color</label>
                                         <a href="#" data-toggle="tooltip" title="" data-placement="right" data-original-title="Use this to adjust the background color of a transparent image, such as a logo." style="font-size:0.8em">[?]</a>
                                         <input type="text" class="form-control" id="editor-background-color" placeholder="#FF0000">
                                     </div>
@@ -160,6 +160,28 @@
                                 </div>
                             </div>
                             <hr>
+                            <div class="row">
+                              <div class="col-sm">
+                                <div class="form-check">
+                                  <input type="checkbox" class="form-check-input" id="editor-smart-crop2">
+                                  <label class="form-check-label" for="editor-smart-crop2">Auto Smart Cropping</label>
+                                  <a href="#" data-toggle="tooltip" title="" data-placement="top" data-original-title="Auto Smart Cropping, leverage multiple label detectin for cropping" style="font-size:0.8em">[?]</a>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editor-smart-crop2-min-confidence">Minimum Confidence</label>
+                                    <a href="#" data-toggle="tooltip" title="" data-placement="top" data-original-title="(Optional) Use this to define the minimum confidence level for labels detection." style="font-size:0.8em">[?]</a>
+                                    <input type="number" class="form-control" id="editor-smart-crop2-min-confidence" placeholder="0">
+                                </div>
+                              </div>
+                              <div class="col-sm">
+                                  <div class="form-group">
+                                      <label for="editor-smart-crop2-padding">Crop Padding</label>
+                                      <a href="#" data-toggle="tooltip" title="" data-placement="top" data-original-title="(Optional) Use this to apply a quick, uniform padding to the smart-cropped image. The padding has been improved so it cannot exceed the original image boundaries." style="font-size:0.8em">[?]</a>
+                                      <input type="number" class="form-control" id="editor-smart-crop2-padding" placeholder="0">
+                                  </div>
+                              </div>
+                            </div>
+                            <hr>
                             <button type="button" class="btn btn-danger" onclick="resetEdits()">Reset</button>
                             <button type="button" class="btn btn-success" onclick="getPreviewImage()">Preview</button>
                         </form>
@@ -184,7 +206,7 @@
                                 <a href="#" data-toggle="tooltip" title="" data-placement="top" data-original-title="The encoded image request URL that can be used in front-end applications." style="font-size:0.8em">[?]</a>
                                 <input type="text" class="form-control" id="preview-encoded-url" placeholder="">
                             </div>
-                        </div>                        
+                        </div>
                         <a href="#" data-toggle="tooltip" title="" data-placement="top" data-original-title="Be sure that you haven't specified any parameters that might be out of range for the image you selected. Reference the debug console for additional error information." style="font-size:0.8em">Having trouble?</a>
                     </div>
                 </div>

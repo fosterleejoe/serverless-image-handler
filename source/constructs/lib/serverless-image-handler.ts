@@ -127,6 +127,14 @@ export class ServerlessImageHandler extends Construct {
             resources: [
               '*'
             ]
+          }),
+          new cdkIam.PolicyStatement({
+            actions: [
+              'rekognition:DetectLabels'
+            ],
+            resources: [
+              '*'
+            ]
           })
         ]
       });
@@ -135,7 +143,7 @@ export class ServerlessImageHandler extends Construct {
       this.addCfnNagSuppressRules(cfnImageHandlerPolicy, [
         {
           id: 'W12',
-          reason: 'rekognition:DetectFaces requires \'*\' resources.'
+          reason: 'rekognition:DetectLabels requires \'*\' resources.'
         }
       ]);
       cfnImageHandlerPolicy.overrideLogicalId('ImageHandlerPolicy');
